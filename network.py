@@ -2,7 +2,7 @@
 # route -n
 
 import scapy.all as scapy
-import optparse
+import argparse
 
 
 def scan(ip):
@@ -21,10 +21,10 @@ def scan(ip):
 
 
 def parse_argumentos():
-    parser = optparse.OptionParser()
-    parser.add_option("-i", dest="ip", help="Ip")
-    (options, _) = parser.parse_args()
-    return options
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", dest="ip", help="Ip")
+    argument = parser.parse_args()
+    return argument
 
 
 argumentos = parse_argumentos()
