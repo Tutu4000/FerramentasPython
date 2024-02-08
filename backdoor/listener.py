@@ -1,4 +1,5 @@
 import socket, json, base64
+import sys
 
 
 # serialização:
@@ -44,7 +45,7 @@ class Listener:
         if ':q' == command[0]:
             self.serial_send('exit')
             self.con.close()
-            exit()
+            sys.exit()
         self.serial_send(command)
         retorno = self.serial_receive()
         return retorno
