@@ -1,5 +1,5 @@
-import socket, json, base64
-import sys
+import socket, json, base64,sys
+
 
 
 # serialização:

